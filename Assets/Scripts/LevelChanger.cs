@@ -1,26 +1,36 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;  // Để chuyển đổi scene
+using UnityEngine.SceneManagement;
 
 public class LevelChanger : MonoBehaviour
 {
-    private static int currentLevel = 1;  // Biến để theo dõi level hiện tại
+    private static int currentLevel = 1;
+    public GameManager gameManager;
 
-    // Hàm gọi khi người chơi va chạm với vật thể
+    private void Start()
+    {
+        if (gameManager == null)
+        {
+            gameManager = FindObjectOfType<GameManager>();
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Kiểm tra nếu đối tượng va chạm là "Player"
-        if (other.gameObject.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            // Kiểm tra và chuyển đến Level tiếp theo
             if (currentLevel == 1)
             {
                 SceneManager.LoadScene("Level 2");
-                currentLevel = 2;  // Cập nhật level hiện tại
+                currentLevel = 2;
             }
             else if (currentLevel == 2)
             {
                 SceneManager.LoadScene("Level 3");
-                currentLevel = 3;  // Cập nhật level hiện tại
+                currentLevel = 3;
+            }
+            else if (currentLevel == 3)
+            {
+                gameManager.WinGame();
             }
         }
     }

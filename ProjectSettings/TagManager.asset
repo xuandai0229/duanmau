@@ -12,6 +12,9 @@ TagManager:
   - Heart
   - MovingPlatform
   - Platform
+  - Checkpoint
+  - LevelEnd
+  - NextLevel
   layers:
   - Default
   - TransparentFX

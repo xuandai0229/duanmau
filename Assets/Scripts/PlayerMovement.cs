@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class PlayerMovement : MonoBehaviour
@@ -15,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float additionalJumpForce = 8f;
     [SerializeField] private float horizontalBoost = 2f;
     private int jumpCount = 0;
-    private int maxJumps = 2; // Cho phép nhảy hai lần
+    private int maxJumps = 2;
 
     [Header("UI")]
     public TextMeshProUGUI livesText;
@@ -31,7 +32,8 @@ public class PlayerMovement : MonoBehaviour
     private CapsuleCollider2D myCapsuleCollider;
     private Animator myAnimator;
     private Vector3 startPosition;
-    private int lives = 3;
+    private Vector3 checkpointPosition;
+    private int lives;
     private int coinsCollected = 0;
 
     private bool isJumping = false;
@@ -44,8 +46,20 @@ public class PlayerMovement : MonoBehaviour
         myRigidbody = GetComponent<Rigidbody2D>();
         myCapsuleCollider = GetComponent<CapsuleCollider2D>();
         myAnimator = GetComponent<Animator>();
+
         startPosition = transform.position;
+        checkpointPosition = PlayerPrefs.HasKey("CheckpointX")
+            ? new Vector3(PlayerPrefs.GetFloat("CheckpointX"), PlayerPrefs.GetFloat("CheckpointY"), 0)
+            : startPosition;
+
+        transform.position = checkpointPosition; // Đặt vị trí nhân vật về checkpoint
+
         originalGravityScale = myRigidbody.gravityScale;
+
+        // Load mạng
+        lives = PlayerPrefs.GetInt("PlayerLives", 3);
+        // Load coins
+        coinsCollected = PlayerPrefs.GetInt("PlayerCoins", 0);
 
         UpdateUI();
     }
@@ -88,7 +102,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Reset lại số lần nhảy khi chạm đất
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
@@ -141,15 +154,20 @@ public class PlayerMovement : MonoBehaviour
 
     public void Respawn()
     {
-        lives--;
-        if (lives > 0)
+        if (lives > 1)
         {
-            transform.position = startPosition;
+            lives--;
+            PlayerPrefs.SetInt("PlayerLives", lives);
+            PlayerPrefs.Save();
+            transform.position = checkpointPosition;
             myRigidbody.velocity = Vector2.zero;
         }
         else
         {
-            Debug.Log("Game Over!");
+            lives = 0;
+            PlayerPrefs.SetInt("PlayerLives", lives);
+            PlayerPrefs.Save();
+            FindObjectOfType<GameManager>().GameOver();
         }
         UpdateUI();
     }
@@ -157,8 +175,17 @@ public class PlayerMovement : MonoBehaviour
     public void CollectCoin()
     {
         coinsCollected++;
-        Debug.Log("Coins Collected: " + coinsCollected);
+        PlayerPrefs.SetInt("PlayerCoins", coinsCollected);
+        PlayerPrefs.Save();
         UpdateUI();
+    }
+
+    public void UpdateCheckpoint(Vector3 newCheckpoint)
+    {
+        checkpointPosition = newCheckpoint;
+        PlayerPrefs.SetFloat("CheckpointX", newCheckpoint.x);
+        PlayerPrefs.SetFloat("CheckpointY", newCheckpoint.y);
+        PlayerPrefs.Save();
     }
 
     private void UpdateUI()
@@ -168,16 +195,5 @@ public class PlayerMovement : MonoBehaviour
 
         if (coinText != null)
             coinText.text = "Coins: " + coinsCollected.ToString();
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Heart"))
-        {
-            lives++;
-            Destroy(collision.gameObject);
-            UpdateUI();
-            Debug.Log("Gained a life! Total lives: " + lives);
-        }
     }
 }

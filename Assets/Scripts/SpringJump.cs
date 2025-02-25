@@ -2,7 +2,7 @@
 
 public class SpringJump : MonoBehaviour
 {
-    public float jumpForce = 20f; // Điều chỉnh độ cao của cú nhảy
+    public float jumpForce = 50f; // Điều chỉnh độ cao của cú nhảy
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -11,8 +11,9 @@ public class SpringJump : MonoBehaviour
             Rigidbody2D rb = collision.gameObject.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
-                rb.velocity = new Vector2(rb.velocity.x, 0f); // Reset vận tốc Y để không cộng dồn
-                rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse); // Đẩy Player lên
+                // Giữ lại vận tốc Y nếu đang bay lên, tránh reset làm mất đà
+                rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y, 0f));
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce); // Đặt lại vận tốc để nhảy cao hơn
             }
         }
     }
