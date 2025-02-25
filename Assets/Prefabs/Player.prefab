@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 3193021074290415770}
   - component: {fileID: 660588879823850973}
   - component: {fileID: 1876089143963752088}
-  - component: {fileID: 8744688194021021498}
+  - component: {fileID: 7040564754492015697}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -234,7 +234,7 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &8744688194021021498
+--- !u!114 &7040564754492015697
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -247,7 +247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runSpeed: 10
-  jumpSpeed: 25
+  jumpSpeed: 20
   climbSpeed: 5
   maxJumpHoldTime: 0.5
   additionalJumpForce: 8

@@ -8,6 +8,10 @@ TagManager:
   - SpikeTrap
   - Coins
   - Coin
+  - Wall
+  - Heart
+  - MovingPlatform
+  - Platform
   layers:
   - Default
   - TransparentFX
@@ -27,7 +31,7 @@ TagManager:
   - SpikeTrap
   - coins
   - Bullet
-  - 
+  - MovingPlatform
   - 
   - 
   - 

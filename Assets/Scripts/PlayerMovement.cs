@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
@@ -8,22 +7,24 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float runSpeed = 10f;
-    [SerializeField] private float jumpSpeed = 10f;  // Tăng giá trị này để nhảy cao hơn
+    [SerializeField] private float jumpSpeed = 20f;
     [SerializeField] private float climbSpeed = 5f;
 
     [Header("Jump Settings")]
-    [SerializeField] private float maxJumpHoldTime = 0.5f; // Thời gian tối đa giữ phím nhảy
-    [SerializeField] private float additionalJumpForce = 8f; // Tăng lực nhảy bổ sung để nhảy cao hơn
-    [SerializeField] private float horizontalBoost = 2f; // Tăng tốc ngang khi nhảy
+    [SerializeField] private float maxJumpHoldTime = 0.5f;
+    [SerializeField] private float additionalJumpForce = 8f;
+    [SerializeField] private float horizontalBoost = 2f;
+    private int jumpCount = 0;
+    private int maxJumps = 2; // Cho phép nhảy hai lần
 
     [Header("UI")]
     public TextMeshProUGUI livesText;
     public TextMeshProUGUI coinText;
 
     [Header("Shooting Settings")]
-    [SerializeField] private GameObject bulletPrefab; // Prefab đạn
-    [SerializeField] private Transform firePoint;     // Điểm xuất phát của đạn
-    [SerializeField] private float fireCooldown = 0.5f; // Thời gian chờ giữa các lần bắn
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float fireCooldown = 0.5f;
 
     private Vector2 moveInput;
     private Rigidbody2D myRigidbody;
@@ -36,8 +37,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isJumping = false;
     private float jumpTime = 0f;
     private float originalGravityScale;
-
-    private float lastFireTime; // Thời gian bắn gần nhất
+    private float lastFireTime;
 
     void Start()
     {
@@ -56,17 +56,15 @@ public class PlayerMovement : MonoBehaviour
         FlipSprite();
         ClimbLadder();
 
-        // Thêm lực nhảy khi giữ phím cách
         if (isJumping && jumpTime < maxJumpHoldTime)
         {
             jumpTime += Time.deltaTime;
             myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, myRigidbody.velocity.y + additionalJumpForce * Time.deltaTime);
         }
 
-        // Kiểm tra phím bắn
         if (Keyboard.current.qKey.wasPressedThisFrame && Time.time - lastFireTime >= fireCooldown)
         {
-            FireBullet(); // Bắn đạn khi nhấn Q
+            FireBullet();
         }
     }
 
@@ -77,15 +75,12 @@ public class PlayerMovement : MonoBehaviour
 
     void OnJump(InputValue value)
     {
-        if (!myCapsuleCollider.IsTouchingLayers(LayerMask.GetMask("Ground"))) return;
-
-        if (value.isPressed)
+        if (value.isPressed && jumpCount < maxJumps)
         {
             isJumping = true;
             jumpTime = 0f;
-
-            // Thêm vận tốc ngang và lực nhảy ban đầu
             myRigidbody.velocity = new Vector2(moveInput.x * horizontalBoost, jumpSpeed);
+            jumpCount++;
         }
         else
         {
@@ -93,16 +88,20 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // Reset lại số lần nhảy khi chạm đất
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            jumpCount = 0;
+        }
+    }
+
     private void FireBullet()
     {
-        // Xác định hướng bắn dựa vào hướng nhân vật
         Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-
-        // Tạo viên đạn
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
         bullet.GetComponent<Bullet>().SetDirection(direction);
-
-        // Ghi nhận thời gian bắn
         lastFireTime = Time.time;
     }
 
@@ -110,7 +109,6 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
         myRigidbody.velocity = playerVelocity;
-
         bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) > Mathf.Epsilon;
         myAnimator.SetBool("isRunning", playerHasHorizontalSpeed);
     }
@@ -118,7 +116,6 @@ public class PlayerMovement : MonoBehaviour
     private void FlipSprite()
     {
         bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) > Mathf.Epsilon;
-
         if (playerHasHorizontalSpeed)
         {
             transform.localScale = new Vector2(Mathf.Sign(myRigidbody.velocity.x), 1f);
@@ -130,12 +127,11 @@ public class PlayerMovement : MonoBehaviour
         if (!myCapsuleCollider.IsTouchingLayers(LayerMask.GetMask("Climbing")))
         {
             myAnimator.SetBool("isClimbing", false);
-            myRigidbody.gravityScale = originalGravityScale; // Khôi phục trọng lực
+            myRigidbody.gravityScale = originalGravityScale;
             return;
         }
 
-        myRigidbody.gravityScale = 0f; // Vô hiệu hóa trọng lực khi leo thang
-
+        myRigidbody.gravityScale = 0f;
         Vector2 climbVelocity = new Vector2(myRigidbody.velocity.x, moveInput.y * climbSpeed);
         myRigidbody.velocity = climbVelocity;
 
@@ -154,7 +150,6 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             Debug.Log("Game Over!");
-            // Thêm logic game over nếu cần
         }
         UpdateUI();
     }
@@ -168,7 +163,21 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateUI()
     {
-        livesText.text = "Lives: " + lives.ToString();
-        coinText.text = "Coins: " + coinsCollected.ToString();
+        if (livesText != null)
+            livesText.text = "Lives: " + lives.ToString();
+
+        if (coinText != null)
+            coinText.text = "Coins: " + coinsCollected.ToString();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Heart"))
+        {
+            lives++;
+            Destroy(collision.gameObject);
+            UpdateUI();
+            Debug.Log("Gained a life! Total lives: " + lives);
+        }
     }
 }
