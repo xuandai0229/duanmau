@@ -1,21 +1,37 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;  // Để chuyển đổi scene
-using TMPro;  // Để sử dụng TextMeshPro
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class MainMenuController : MonoBehaviour
 {
-    // Hàm bắt đầu game
-    public void StartGame()
+    public TMP_Text leaderboardText, welcomeText;
+
+    private void Start()
     {
-        // Chuyển sang scene Level1
-        SceneManager.LoadScene("Lever 1");
+        string username = PlayerPrefs.GetString("SavedUsername", "Guest");
+        welcomeText.text = "👋 Chào " + username + "!";
+
+        ShowLeaderboard();
     }
 
-    // Hàm thoát game
+    public void StartGame()
+    {
+        SceneManager.LoadScene("Level 1");
+    }
+
+    public void Logout()
+    {
+        PlayerPrefs.DeleteKey("SavedUsername");
+        SceneManager.LoadScene("LoginScene");
+    }
+
     public void ExitGame()
     {
-        // Thoát game khi chơi ở chế độ build
-        Debug.Log("Exiting Game");
-        Application.Quit();  // Thoát game
+        Application.Quit();
+    }
+
+    private void ShowLeaderboard()
+    {
+        leaderboardText.text = "🏆 Top 3 Thành Tích:\n1. Chưa có dữ liệu\n2. Chưa có dữ liệu\n3. Chưa có dữ liệu";
     }
 }

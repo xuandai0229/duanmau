@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using TMPro;
 
 public class PlayerMovement : MonoBehaviour
@@ -32,8 +31,8 @@ public class PlayerMovement : MonoBehaviour
     private CapsuleCollider2D myCapsuleCollider;
     private Animator myAnimator;
     private Vector3 startPosition;
-    private Vector3 checkpointPosition;
-    private int lives;
+    private Vector3 checkpointPosition; // ✅ Biến lưu vị trí checkpoint
+    private int lives = 3;
     private int coinsCollected = 0;
 
     private bool isJumping = false;
@@ -46,20 +45,9 @@ public class PlayerMovement : MonoBehaviour
         myRigidbody = GetComponent<Rigidbody2D>();
         myCapsuleCollider = GetComponent<CapsuleCollider2D>();
         myAnimator = GetComponent<Animator>();
-
         startPosition = transform.position;
-        checkpointPosition = PlayerPrefs.HasKey("CheckpointX")
-            ? new Vector3(PlayerPrefs.GetFloat("CheckpointX"), PlayerPrefs.GetFloat("CheckpointY"), 0)
-            : startPosition;
-
-        transform.position = checkpointPosition; // Đặt vị trí nhân vật về checkpoint
-
+        checkpointPosition = startPosition; // ✅ Ban đầu checkpoint = vị trí xuất phát
         originalGravityScale = myRigidbody.gravityScale;
-
-        // Load mạng
-        lives = PlayerPrefs.GetInt("PlayerLives", 3);
-        // Load coins
-        coinsCollected = PlayerPrefs.GetInt("PlayerCoins", 0);
 
         UpdateUI();
     }
@@ -154,38 +142,30 @@ public class PlayerMovement : MonoBehaviour
 
     public void Respawn()
     {
-        if (lives > 1)
+        lives--;
+        if (lives > 0)
         {
-            lives--;
-            PlayerPrefs.SetInt("PlayerLives", lives);
-            PlayerPrefs.Save();
-            transform.position = checkpointPosition;
+            transform.position = checkpointPosition; // ✅ Hồi sinh tại checkpoint thay vì vị trí ban đầu
             myRigidbody.velocity = Vector2.zero;
         }
         else
         {
-            lives = 0;
-            PlayerPrefs.SetInt("PlayerLives", lives);
-            PlayerPrefs.Save();
-            FindObjectOfType<GameManager>().GameOver();
+            Debug.Log("Game Over!");
         }
-        UpdateUI();
-    }
-
-    public void CollectCoin()
-    {
-        coinsCollected++;
-        PlayerPrefs.SetInt("PlayerCoins", coinsCollected);
-        PlayerPrefs.Save();
         UpdateUI();
     }
 
     public void UpdateCheckpoint(Vector3 newCheckpoint)
     {
-        checkpointPosition = newCheckpoint;
-        PlayerPrefs.SetFloat("CheckpointX", newCheckpoint.x);
-        PlayerPrefs.SetFloat("CheckpointY", newCheckpoint.y);
-        PlayerPrefs.Save();
+        checkpointPosition = newCheckpoint; // ✅ Cập nhật vị trí checkpoint mới
+        Debug.Log("Checkpoint updated: " + checkpointPosition);
+    }
+
+    public void CollectCoin()
+    {
+        coinsCollected++;
+        Debug.Log("Coins Collected: " + coinsCollected);
+        UpdateUI();
     }
 
     private void UpdateUI()
@@ -195,5 +175,20 @@ public class PlayerMovement : MonoBehaviour
 
         if (coinText != null)
             coinText.text = "Coins: " + coinsCollected.ToString();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Heart"))
+        {
+            lives++;
+            Destroy(collision.gameObject);
+            UpdateUI();
+            Debug.Log("Gained a life! Total lives: " + lives);
+        }
+        else if (collision.CompareTag("Checkpoint")) // ✅ Khi chạm vào checkpoint, cập nhật vị trí mới
+        {
+            UpdateCheckpoint(collision.transform.position);
+        }
     }
 }

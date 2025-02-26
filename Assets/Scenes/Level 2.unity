@@ -36968,6 +36968,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1718594648370786536, guid: 3131f1826cf1bce428d9e0aa3eed6a83, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6762757019830765710, guid: 3131f1826cf1bce428d9e0aa3eed6a83, type: 3}
+      propertyPath: jumpForce
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 8311686913045292054, guid: 3131f1826cf1bce428d9e0aa3eed6a83, type: 3}
       propertyPath: m_Name
       value: Pedestal Diff

@@ -4,40 +4,60 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public TextMeshProUGUI gameOverText;
-    public TextMeshProUGUI winText;
-    public GameObject gameMenu;
+    public GameObject winPanel, losePanel; // Panel hiển thị khi thắng/thua
+    public TMP_Text coinText, winCoinText, loseCoinText; // Hiển thị số coin
 
-    private bool isGameOver = false;
+    private int coins = 0;
 
-    void Start()
+    private void Start()
     {
-        gameOverText.gameObject.SetActive(false);
-        winText.gameObject.SetActive(false);
-        gameMenu.SetActive(false);
-        Time.timeScale = 1;
+        winPanel.SetActive(false);
+        losePanel.SetActive(false);
+        UpdateCoinUI();
     }
 
-    public void GameOver()
+    public void AddCoin(int amount)
     {
-        isGameOver = true;
-        gameOverText.gameObject.SetActive(true);
-        gameMenu.SetActive(true);
-        Time.timeScale = 0;
+        coins += amount;
+        UpdateCoinUI();
     }
 
-    public void WinGame()
+    private void UpdateCoinUI()
     {
-        isGameOver = true;
-        winText.gameObject.SetActive(true);
-        gameMenu.SetActive(true);
-        Time.timeScale = 0;
+        coinText.text = "💰 Coins: " + coins;
+    }
+
+    public void GameOver(bool isWin)
+    {
+        if (isWin)
+        {
+            winPanel.SetActive(true);
+            winCoinText.text = "Bạn đã thắng!\nSố Coin: " + coins;
+        }
+        else
+        {
+            losePanel.SetActive(true);
+            loseCoinText.text = "Bạn đã thua!\nSố Coin: " + coins;
+        }
+
+        Time.timeScale = 0; // Dừng game
     }
 
     public void RestartGame()
     {
-        PlayerPrefs.DeleteKey("PlayerLives"); // Reset mạng
-        PlayerPrefs.DeleteKey("PlayerCoins"); // Reset coins về 0 khi restart game
+        Time.timeScale = 1;
+        SceneManager.LoadScene("GameScene");
+    }
+
+    public void ReturnToMainMenu()
+    {
+        Time.timeScale = 1;
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public void ExitGame()
+    {
+        Debug.Log("Thoát game!");
+        Application.Quit();
     }
 }
