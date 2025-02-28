@@ -1,14 +1,19 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Coin : MonoBehaviour
 {
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (other.CompareTag("Player"))
+        if (collision.CompareTag("Player"))
         {
-            // Gọi phương thức CollectCoin của PlayerMovement
-            other.GetComponent<PlayerMovement>()?.CollectCoin();
-            Destroy(gameObject); // Xóa coin khỏi màn chơi
+            PlayerMovement player = collision.GetComponent<PlayerMovement>();
+            if (player != null)
+            {
+                player.CollectCoin();
+            }
+            Destroy(gameObject); // Xóa coin sau khi ăn
         }
     }
 }

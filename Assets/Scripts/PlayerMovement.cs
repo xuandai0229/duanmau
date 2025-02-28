@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
@@ -16,6 +15,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float horizontalBoost = 2f;
     private int jumpCount = 0;
     private int maxJumps = 2;
+    private bool isJumping = false;
+    private float jumpTime = 0f;
 
     [Header("UI")]
     public TextMeshProUGUI livesText;
@@ -25,29 +26,29 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float fireCooldown = 0.5f;
+    private float lastFireTime;
 
     private Vector2 moveInput;
     private Rigidbody2D myRigidbody;
     private CapsuleCollider2D myCapsuleCollider;
     private Animator myAnimator;
-    private Vector3 startPosition;
-    private Vector3 checkpointPosition; // ✅ Biến lưu vị trí checkpoint
+    private Vector3 checkpointPosition;
     private int lives = 3;
     private int coinsCollected = 0;
-
-    private bool isJumping = false;
-    private float jumpTime = 0f;
     private float originalGravityScale;
-    private float lastFireTime;
+    private GameManager gameManager;
 
     void Start()
     {
         myRigidbody = GetComponent<Rigidbody2D>();
         myCapsuleCollider = GetComponent<CapsuleCollider2D>();
         myAnimator = GetComponent<Animator>();
-        startPosition = transform.position;
-        checkpointPosition = startPosition; // ✅ Ban đầu checkpoint = vị trí xuất phát
+        checkpointPosition = transform.position;
         originalGravityScale = myRigidbody.gravityScale;
+
+        gameManager = FindObjectOfType<GameManager>();
+        if (gameManager == null)
+            Debug.LogError("❌ Không tìm thấy GameManager!");
 
         UpdateUI();
     }
@@ -57,16 +58,20 @@ public class PlayerMovement : MonoBehaviour
         Run();
         FlipSprite();
         ClimbLadder();
-
-        if (isJumping && jumpTime < maxJumpHoldTime)
-        {
-            jumpTime += Time.deltaTime;
-            myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, myRigidbody.velocity.y + additionalJumpForce * Time.deltaTime);
-        }
+        HandleJump();
 
         if (Keyboard.current.qKey.wasPressedThisFrame && Time.time - lastFireTime >= fireCooldown)
         {
             FireBullet();
+        }
+    }
+
+    private void HandleJump()
+    {
+        if (isJumping && jumpTime < maxJumpHoldTime)
+        {
+            jumpTime += Time.deltaTime;
+            myRigidbody.velocity += new Vector2(0, additionalJumpForce * Time.deltaTime);
         }
     }
 
@@ -110,14 +115,12 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, myRigidbody.velocity.y);
         myRigidbody.velocity = playerVelocity;
-        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) > Mathf.Epsilon;
-        myAnimator.SetBool("isRunning", playerHasHorizontalSpeed);
+        myAnimator.SetBool("isRunning", Mathf.Abs(myRigidbody.velocity.x) > Mathf.Epsilon);
     }
 
     private void FlipSprite()
     {
-        bool playerHasHorizontalSpeed = Mathf.Abs(myRigidbody.velocity.x) > Mathf.Epsilon;
-        if (playerHasHorizontalSpeed)
+        if (Mathf.Abs(myRigidbody.velocity.x) > Mathf.Epsilon)
         {
             transform.localScale = new Vector2(Mathf.Sign(myRigidbody.velocity.x), 1f);
         }
@@ -133,11 +136,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         myRigidbody.gravityScale = 0f;
-        Vector2 climbVelocity = new Vector2(myRigidbody.velocity.x, moveInput.y * climbSpeed);
-        myRigidbody.velocity = climbVelocity;
-
-        bool playerHasVerticalSpeed = Mathf.Abs(myRigidbody.velocity.y) > Mathf.Epsilon;
-        myAnimator.SetBool("isClimbing", playerHasVerticalSpeed);
+        myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, moveInput.y * climbSpeed);
+        myAnimator.SetBool("isClimbing", Mathf.Abs(myRigidbody.velocity.y) > Mathf.Epsilon);
     }
 
     public void Respawn()
@@ -145,27 +145,31 @@ public class PlayerMovement : MonoBehaviour
         lives--;
         if (lives > 0)
         {
-            transform.position = checkpointPosition; // ✅ Hồi sinh tại checkpoint thay vì vị trí ban đầu
+            transform.position = checkpointPosition;
             myRigidbody.velocity = Vector2.zero;
         }
         else
         {
-            Debug.Log("Game Over!");
+            if (gameManager != null)
+                gameManager.GameOver(false);
+            else
+                Debug.LogError("❌ GameManager is NULL khi gọi GameOver!");
         }
         UpdateUI();
     }
 
-    public void UpdateCheckpoint(Vector3 newCheckpoint)
-    {
-        checkpointPosition = newCheckpoint; // ✅ Cập nhật vị trí checkpoint mới
-        Debug.Log("Checkpoint updated: " + checkpointPosition);
-    }
-
     public void CollectCoin()
     {
-        coinsCollected++;
-        Debug.Log("Coins Collected: " + coinsCollected);
-        UpdateUI();
+        if (gameManager != null)
+        {
+            coinsCollected++;
+            gameManager.AddCoin(1);
+            UpdateUI();
+        }
+        else
+        {
+            Debug.LogError("GameManager is missing in the scene!");
+        }
     }
 
     private void UpdateUI()
@@ -184,11 +188,21 @@ public class PlayerMovement : MonoBehaviour
             lives++;
             Destroy(collision.gameObject);
             UpdateUI();
-            Debug.Log("Gained a life! Total lives: " + lives);
         }
-        else if (collision.CompareTag("Checkpoint")) // ✅ Khi chạm vào checkpoint, cập nhật vị trí mới
+        else if (collision.CompareTag("Checkpoint"))
         {
             UpdateCheckpoint(collision.transform.position);
         }
+        else if (collision.CompareTag("Finish"))
+        {
+            if (gameManager != null)
+                gameManager.GameOver(true);
+        }
+    }
+
+    public void UpdateCheckpoint(Vector3 newCheckpoint)
+    {
+        checkpointPosition = newCheckpoint;
+        Debug.Log("✔ Checkpoint updated: " + checkpointPosition);
     }
 }

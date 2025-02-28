@@ -4,15 +4,30 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject winPanel, losePanel; // Panel hiển thị khi thắng/thua
-    public TMP_Text coinText, winCoinText, loseCoinText; // Hiển thị số coin
+    public static GameManager Instance { get; private set; }  // Singleton
+
+    public GameObject winPanel, losePanel;
+    public TMP_Text coinText, winCoinText, loseCoinText;
 
     private int coins = 0;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);  // Giữ lại khi chuyển Scene
+        }
+        else
+        {
+            Destroy(gameObject);  // Nếu đã có một GameManager, hủy cái mới
+        }
+    }
+
     private void Start()
     {
-        winPanel.SetActive(false);
-        losePanel.SetActive(false);
+        if (winPanel != null) winPanel.SetActive(false);
+        if (losePanel != null) losePanel.SetActive(false);
         UpdateCoinUI();
     }
 
@@ -24,29 +39,35 @@ public class GameManager : MonoBehaviour
 
     private void UpdateCoinUI()
     {
-        coinText.text = "💰 Coins: " + coins;
+        if (coinText != null)
+            coinText.text = "💰 Coins: " + coins;
     }
 
     public void GameOver(bool isWin)
     {
-        if (isWin)
+        if (isWin && winPanel != null)
         {
-            winPanel.SetActive(true);
-            winCoinText.text = "Bạn đã thắng!\nSố Coin: " + coins;
+            winPanel.SetActive(true);  // Hiển thị panel chiến thắng
+            winCoinText.text = "🎉 Bạn đã thắng!\nSố Coin: " + coins;
         }
-        else
+        else if (!isWin && losePanel != null)
         {
             losePanel.SetActive(true);
-            loseCoinText.text = "Bạn đã thua!\nSố Coin: " + coins;
+            loseCoinText.text = "❌ Bạn đã thua!\nSố Coin: " + coins;
         }
 
-        Time.timeScale = 0; // Dừng game
+        Invoke("PauseGame", 0.1f);
+    }
+
+    private void PauseGame()
+    {
+        Time.timeScale = 0;  // Dừng thời gian khi game kết thúc
     }
 
     public void RestartGame()
     {
         Time.timeScale = 1;
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void ReturnToMainMenu()

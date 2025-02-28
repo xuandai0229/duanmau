@@ -10,7 +10,6 @@ TagManager:
   - Coin
   - Wall
   - Heart
-  - MovingPlatform
   - Platform
   - Checkpoint
   - LevelEnd
