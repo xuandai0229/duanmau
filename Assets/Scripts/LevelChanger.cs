@@ -3,12 +3,15 @@ using UnityEngine.SceneManagement;
 
 public class LevelChanger : MonoBehaviour
 {
-    private static int currentLevel = 1;
-    private GameManager gameManager;
+    private static int currentLevel = 1; // Biến static để giữ level
 
     private void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
+        // Cập nhật `currentLevel` dựa trên tên scene
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (sceneName == "Level 1") currentLevel = 1;
+        else if (sceneName == "Level 2") currentLevel = 2;
+        else if (sceneName == "Level 3") currentLevel = 3;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -27,7 +30,7 @@ public class LevelChanger : MonoBehaviour
             }
             else if (currentLevel == 3)
             {
-                gameManager.GameOver(true);
+                FindObjectOfType<GameManager>().GameOver(true);
             }
         }
     }

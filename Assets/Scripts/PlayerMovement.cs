@@ -152,8 +152,6 @@ public class PlayerMovement : MonoBehaviour
         {
             if (gameManager != null)
                 gameManager.GameOver(false);
-            else
-                Debug.LogError("❌ GameManager is NULL khi gọi GameOver!");
         }
         UpdateUI();
     }
@@ -165,10 +163,6 @@ public class PlayerMovement : MonoBehaviour
             coinsCollected++;
             gameManager.AddCoin(1);
             UpdateUI();
-        }
-        else
-        {
-            Debug.LogError("GameManager is missing in the scene!");
         }
     }
 
@@ -193,16 +187,11 @@ public class PlayerMovement : MonoBehaviour
         {
             UpdateCheckpoint(collision.transform.position);
         }
-        else if (collision.CompareTag("Finish"))
-        {
-            if (gameManager != null)
-                gameManager.GameOver(true);
-        }
+        
     }
 
     public void UpdateCheckpoint(Vector3 newCheckpoint)
     {
         checkpointPosition = newCheckpoint;
-        Debug.Log("✔ Checkpoint updated: " + checkpointPosition);
     }
 }

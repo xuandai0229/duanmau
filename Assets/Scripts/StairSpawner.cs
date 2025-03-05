@@ -3,7 +3,7 @@
 public class StairSpawner : MonoBehaviour
 {
     public GameObject stairPrefab; // Prefab bậc thang
-    public int stairCount = 5; // Số lượng bậc thang muốn tạo
+    public int stairCount = 7; // Số lượng bậc thang muốn tạo
     public float stairSpacing = 3f; // Khoảng cách giữa các bậc thang
     public Vector2 startPosition = new Vector2(14.6f, 4.3f); // Vị trí bậc thang đầu tiên
 

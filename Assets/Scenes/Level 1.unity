@@ -343,7 +343,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.9587107, y: -1.9793099, z: -10}
+  m_LocalPosition: {x: -3.9700136, y: -1.97929, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5075,6 +5075,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3025816691103907445, guid: 632beacef2177f54e958fc6734dc4be8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7786154320074642783, guid: 632beacef2177f54e958fc6734dc4be8, type: 3}
       propertyPath: coinText
       value: 
@@ -8394,29 +8398,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 452146068861426542, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 658862255738114303, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: restartButton
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 1367432473483527722, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2347606226450637117, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
       propertyPath: m_Name
       value: Canvas
-      objectReference: {fileID: 0}
-    - target: {fileID: 3128604428501802509, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 106
-      objectReference: {fileID: 0}
-    - target: {fileID: 3128604428501802509, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -55
       objectReference: {fileID: 0}
     - target: {fileID: 4050179845810609324, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
       propertyPath: m_Pivot.x
@@ -8497,26 +8481,6 @@ PrefabInstance:
     - target: {fileID: 4050179845810609324, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4482689703045886093, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4631787374326208930, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: RestartGame
-      objectReference: {fileID: 0}
-    - target: {fileID: 8549316201299119794, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9052625066116675475, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 9052625066116675475, guid: 0b1c3ae9485bc3f4e82ea7b38f16a077, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 51
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

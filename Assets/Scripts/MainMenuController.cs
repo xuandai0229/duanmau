@@ -9,7 +9,7 @@ public class MainMenuController : MonoBehaviour
     private void Start()
     {
         string username = PlayerPrefs.GetString("SavedUsername", "Guest");
-        welcomeText.text = "👋 Chào " + username + "!";
+        welcomeText.text = " Chào " + username + "!";
 
         ShowLeaderboard();
     }
@@ -32,6 +32,6 @@ public class MainMenuController : MonoBehaviour
 
     private void ShowLeaderboard()
     {
-        leaderboardText.text = "🏆 Top 3 Thành Tích:\n1. Chưa có dữ liệu\n2. Chưa có dữ liệu\n3. Chưa có dữ liệu";
+        leaderboardText.text = " Top 3 Thành Tích:\n1. Chưa có dữ liệu\n2. Chưa có dữ liệu\n3. Chưa có dữ liệu";
     }
 }

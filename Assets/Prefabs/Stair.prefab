@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8642401204582049973}
   - component: {fileID: 6089424466580877322}
   - component: {fileID: 114608795087354960}
-  - component: {fileID: 7657587091173660203}
+  - component: {fileID: 2700519363976210355}
   m_Layer: 0
   m_Name: Stair
   m_TagString: Untagged
@@ -159,7 +159,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 3
---- !u!114 &7657587091173660203
+--- !u!114 &2700519363976210355
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -171,5 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11dcf2d215a06c94198312aa09bf4fe2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallDelay: 0.1
-  reappearTime: 2
+  fallDelay: 0.5
+  destroyDelay: 2
+  shakeIntensity: 0.1
+  shakeDuration: 0.3

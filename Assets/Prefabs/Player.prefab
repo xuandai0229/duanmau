@@ -247,7 +247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runSpeed: 10
-  jumpSpeed: 20
+  jumpSpeed: 15
   climbSpeed: 5
   maxJumpHoldTime: 0.5
   additionalJumpForce: 8
